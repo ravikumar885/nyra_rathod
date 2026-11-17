@@ -2,13 +2,18 @@ import { chromium } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { cwd } from 'node:process';
-import { requiredEnv } from './config/env';
+import { optionalEnv, requiredEnv } from './config/env';
 import { LoginPage } from './pages/loginPage';
 
 async function globalSetup(): Promise<void> {
+  const username = optionalEnv('USERNAME', 'Username');
+  const password = optionalEnv('PASSWORD', 'Password');
+  if (!username || !password) {
+    console.warn('Skipping authenticated setup: USERNAME and PASSWORD are required for login tests.');
+    return;
+  }
+
   const baseURL = requiredEnv('BASE_URL', 'Base_Url');
-  const username = requiredEnv('USERNAME', 'Username');
-  const password = requiredEnv('PASSWORD', 'Password');
   const storageStatePath = resolve(cwd(), 'playwright', '.auth', 'user.json');
 
   mkdirSync(dirname(storageStatePath), { recursive: true });

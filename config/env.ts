@@ -39,6 +39,15 @@ function loadEnvFile(): void {
 loadEnvFile();
 
 export function requiredEnv(...names: string[]): string {
+  const value = optionalEnv(...names);
+  if (value) {
+    return value;
+  }
+
+  throw new Error(`Missing required environment variable: ${names.join(' or ')}`);
+}
+
+export function optionalEnv(...names: string[]): string | undefined {
   for (const name of names) {
     const value = nodeProcess.env[name];
     if (value) {
@@ -46,5 +55,5 @@ export function requiredEnv(...names: string[]): string {
     }
   }
 
-  throw new Error(`Missing required environment variable: ${names.join(' or ')}`);
+  return undefined;
 }

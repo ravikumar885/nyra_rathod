@@ -1,7 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
-import { requiredEnv } from './config/env';
+import { optionalEnv, requiredEnv } from './config/env';
 
 const isCI = Boolean((globalThis as any).process?.env?.CI);
+const hasCredentials = Boolean(optionalEnv('USERNAME', 'Username') && optionalEnv('PASSWORD', 'Password'));
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -26,7 +27,7 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: requiredEnv('BASE_URL', 'Base_Url'),
-    storageState: 'playwright/.auth/user.json',
+    storageState: hasCredentials ? 'playwright/.auth/user.json' : undefined,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
